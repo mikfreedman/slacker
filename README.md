@@ -56,6 +56,29 @@ You must set all of these when you include this dependency in your project,
 however you can easily run this project as is and the above credentials will
 log you into slack so long as you set the SLACK_API_TOKEN env var.
 
+## Testing Commands
+
+Testing your commands is simple. Here is an example of testing the echo command:
+
+```elixir
+defmodule Slacker.Commands.EchoTest do
+  use ExUnit.Case
+
+  test "it echoes the message" do
+    {:ok, manager} = GenEvent.start_link
+    GenEvent.add_handler(manager, Slacker.Commands.Echo, self)
+
+    message = %{}
+    GenEvent.notify(manager, {{:command, "echo", "funky fried chicken"}, %{bot_pid: self, message: message}})
+    assert_receive {:reply, message, "funky fried chicken"}
+  end
+end
+```
+
+Since responding to messages is just done via sending a message back to the
+calling process you can just pass in `self` (as above) when dispatching and the
+responses will end up in your mailbox.
+
 ## Installation
 
 The package can be installed as:
