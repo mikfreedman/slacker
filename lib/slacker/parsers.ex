@@ -1,5 +1,5 @@
 defmodule Slacker.Parsers do
-  def try_parse(message, parsers \\ Application.get_env(:slacker, :parsers), command_prefixes \\ Application.get_env(:slacker, :command_prefix)) do
+  def try_parse(message, command_prefixes, parsers \\ Application.get_env(:slacker, :parsers)) do
 
     # Support single prefix or multiple in a list
     command_prefixes = List.wrap(command_prefixes)

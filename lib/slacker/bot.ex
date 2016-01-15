@@ -2,12 +2,15 @@ defmodule Slacker.Bot do
   require Logger
   use Slack
 
-  def handle_connect(_, _) do
+  def handle_connect(slack, _) do
     Logger.info fn -> "Connected to Slack." end
 
     commands = Application.get_env(:slacker, :commands)
     event_manager = setup_event_manager(commands)
-    {:ok, %{event_manager: event_manager}}
+
+    command_prefixes = List.wrap(Application.get_env(:slacker, :command_prefix)) ++ [ "<@#{slack.me.id}>" ]
+
+    {:ok, %{event_manager: event_manager, command_prefixes: command_prefixes}}
   end
 
   def setup_event_manager(commands) do
@@ -23,11 +26,11 @@ defmodule Slacker.Bot do
     event_manager
   end
 
-  def handle_message(message = %{type: "message", text: text}, slack, state = %{event_manager: event_manager}) do
+  def handle_message(message = %{type: "message", text: text}, slack, state = %{event_manager: event_manager, command_prefixes: command_prefixes}) do
     Logger.debug fn -> "Received message from slack: #{text}" end
 
     unless sent_from_me?(message, slack) do
-      command = Slacker.Parsers.try_parse(text)
+      command = Slacker.Parsers.try_parse(text, command_prefixes)
       if command do
         Logger.debug fn -> "Notifying for command: #{inspect(command)}" end
         meta = %{bot_pid: self, message: message}
