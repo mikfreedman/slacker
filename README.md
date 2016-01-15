@@ -124,12 +124,28 @@ The package can be installed as:
 
   1. Add slacker to your list of dependencies in `mix.exs`:
 
-        def deps do
-          [{:slacker, git: "https://github.com/mikfreedman/slacker.git"}]
-        end
+```elixir
+def deps do
+  [{:slacker, git: "https://github.com/mikfreedman/slacker.git"}]
+end
+```
 
   2. Ensure slacker is started before your application:
 
-        def application do
-          [applications: [:slacker]]
-        end
+```elixir
+def application do
+  [applications: [:slacker]]
+end
+```
+
+## Development
+
+### Setup
+```bash
+$ mix deps.get
+```
+
+### Run The Tests
+```bash
+$ mix test --no-start
+```
