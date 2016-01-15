@@ -23,7 +23,7 @@ defmodule Slacker.Bot do
   def handle_message(message = %{type: "message", text: text}, slack, state = %{event_manager: event_manager}) do
 
     unless sent_from_me?(message, slack) do
-      command = Slacker.Parser.try_parse(text)
+      command = Slacker.Parsers.try_parse(text)
       if command do
         meta = %{bot_pid: self, message: message}
         GenEvent.notify(event_manager, {command, meta})

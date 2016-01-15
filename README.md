@@ -49,12 +49,51 @@ The config setup for this project is as follows:
 config :slacker,
   command_prefix: "slacker",
   slack_api_token: System.get_env("SLACK_API_TOKEN"),
+  parsers: [Slacker.Parsers.Prefix],
   commands: [Slacker.Commands.Echo, Slacker.Commands.Ping]
 ```
 
 You must set all of these when you include this dependency in your project,
 however you can easily run this project as is and the above credentials will
 log you into slack so long as you set the SLACK_API_TOKEN env var.
+
+## Custom Parsers
+You can write your own command parsers if you need special parsing that doesn't fit in with the prefix parsing. For example if your command parser needs infix parsing you could do the following:
+
+```elixir
+defmodule MyInfixParser do
+  # Handles messages like "@slacker dylan beat mik" to give back {:command, "beat", "dylan", "mik"}
+  def try_parse(message) do
+    match = Regex.named_captures(~r/(?<lhs>[\w]+)\s+(?<command>[\w]+)\s+(?<rhs>[\w]+)/i, message)
+    if match && match["command"] do
+      {:command, match["command"], match["lhs"], match["rhs"]}
+    else
+      nil
+    end
+  end
+end
+```
+
+Update the `config/config.exs` with your new parser like so:
+
+```elixir
+...
+parsers: [MyInfixParser, Slacker.Parsers.Prefix], # Optionally keep the default parser
+...
+```
+
+NOTE: That your module must implement the `try_parse` function.
+
+
+## Custom Command Prefixes
+You can add multiple command prefixes in `config/config.exs` like so:
+```elixir
+...
+command_prefix: ["slacker", "sl"]
+...
+```
+
+This will mean your bot responds to either of those names.
 
 ## Testing Commands
 
