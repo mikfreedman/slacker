@@ -8,7 +8,6 @@ defmodule Slacker do
 
     slack_api_token = Application.get_env(:slacker, :slack_api_token)
 
-    IO.inspect(slack_api_token)
     children = [
       worker(Slacker.Bot, [slack_api_token, []]),
     ]
