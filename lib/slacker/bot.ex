@@ -26,11 +26,13 @@ defmodule Slacker.Bot do
     event_manager
   end
 
-  def handle_message(message = %{type: "message", text: text}, slack, state = %{event_manager: event_manager, command_prefixes: command_prefixes}) do
-    Logger.debug fn -> "Received message from slack: #{text}" end
+  def handle_message(message = %{type: "message"}, slack, state = %{event_manager: event_manager, command_prefixes: command_prefixes}) do
+    Logger.debug fn -> "Received message from slack: #{message.text}" end
 
-    unless sent_from_me?(message, slack) do
-      command = Slacker.Parsers.try_parse(text, command_prefixes)
+    if matched = Slacker.Filter.match(message, slack, command_prefixes) do
+      Logger.debug fn -> "matched message: #{inspect(matched)}" end
+
+      command = Slacker.Parsers.try_parse(matched)
       if command do
         Logger.debug fn -> "Notifying for command: #{inspect(command)}" end
         meta = %{bot_pid: self, message: message}
@@ -45,10 +47,6 @@ defmodule Slacker.Bot do
     send_message(reply_text, message.channel, slack)
 
     {:ok, state}
-  end
-
-  def sent_from_me?(%{user: sender_id}, %{me: %{id: my_id}}) do
-    sender_id == my_id
   end
 
   def handle_message(_message, _slack, state) do
