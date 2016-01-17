@@ -125,8 +125,16 @@ The package can be installed as:
   1. Add slacker to your list of dependencies in `mix.exs`:
 
 ```elixir
+def application do
+  [applications: [:logger, :slacker, :slack]]
+end
+
 def deps do
-  [{:slacker, git: "https://github.com/mikfreedman/slacker.git"}]
+  [
+    {:slacker, git: "https://github.com/mikfreedman/slacker.git"}
+    {:slack, "~> 0.3"},
+    {:websocket_client, git: "https://github.com/jeremyong/websocket_client"},
+  ]
 end
 ```
 
