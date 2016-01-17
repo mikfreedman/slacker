@@ -28,16 +28,22 @@ defmodule Slacker.Bot do
 
   def handle_message(message = %{type: "message"}, slack, state = %{event_manager: event_manager, command_prefixes: command_prefixes}) do
     Logger.debug fn -> "Received message from slack: #{message.text}" end
+    meta = %{bot_pid: self, message: message}
 
+    # Try to match command pattern then dispatch that
     if matched = Slacker.Filter.match(message, slack, command_prefixes) do
-      Logger.debug fn -> "matched message: #{inspect(matched)}" end
+      Logger.debug fn -> "Matched message: #{inspect(matched)}" end
 
       command = Slacker.Parsers.try_parse(matched)
       if command do
         Logger.debug fn -> "Notifying for command: #{inspect(command)}" end
-        meta = %{bot_pid: self, message: message}
         GenEvent.notify(event_manager, {command, meta})
       end
+    end
+
+    # Dispatch everything as :message
+    unless Slacker.Filter.sent_from_me?(message, slack) do
+      GenEvent.notify(event_manager, {{:message, message.text}, meta})
     end
 
     {:ok, state}
