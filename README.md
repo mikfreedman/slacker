@@ -42,6 +42,37 @@ output of `slacker help` if they are defined.
 The commands that your bot actually runs must be configured and you can mix and
 match between packaged commands and any commands you define.
 
+## Listening For Arbitrary Messages
+
+If for some reason you need to listen for arbitrary messages that aren't parsed
+as commands you can add a function to pattern match for plain messages. Below
+is the pre-packaged "message_count" command. It counts all messages then sends the
+count when you use the `message_count` command.
+
+```elixir
+defmodule Slacker.Commands.MessageCount do
+  use Slacker.Command
+
+  @usage "message_count"
+  @short_description "responds with the number of messages it has seen"
+
+  def init(args) do
+    {:ok, 0}
+  end
+
+  def handle_event({{:command, "message_count", _message}, meta}, count) do
+    respond("I have seen #{count} messages.", meta)
+    {:ok, count}
+  end
+
+  def handle_event({{:message, _message}, meta}, count) do
+    {:ok, count + 1}
+  end
+end
+```
+
+NOTE: If something is parsed as a command it will end up being dispatched twice. Once as :command and once as :message. That's why in the above example I'm sure not increment the count in the :command callback.
+
 ## Config
 The config setup for this project is as follows:
 
