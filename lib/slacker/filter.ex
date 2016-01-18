@@ -5,11 +5,18 @@ defmodule Slacker.Filter do
 
       Enum.find_value command_prefixes, fn(command_prefix) ->
       match = Regex.named_captures(~r/^\s*@?#{command_prefix}:?\s+(?<message>.*)/i, message.text)
-      if match && match["message"] do
-          match["message"]
+
+      command = match["message"]
+
+      if command || direct_message?(message) do
+          command || message.text
         end
       end
     end
+  end
+
+  defp direct_message?(message) do
+   Application.get_env(:slacker, :allow_direct_messages) && Regex.match?(~r/^D/, message.channel)
   end
 
   def sent_from_me?(%{user: sender_id}, %{me: %{id: my_id}}) do

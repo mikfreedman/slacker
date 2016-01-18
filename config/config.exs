@@ -14,6 +14,7 @@ config :slacker,
   command_prefix: "slacker",
   slack_api_token: System.get_env("SLACK_API_TOKEN"),
   parsers: [Slacker.Parsers.Prefix],
+  allow_direct_messsages: true,
   commands: [Slacker.Commands.Echo, Slacker.Commands.Ping, Slacker.Commands.MessageCount]
 
 #

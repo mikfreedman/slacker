@@ -29,6 +29,18 @@ defmodule Slacker.FilterTest do
     assert Slacker.Filter.match(%{user: "1", text: "foobar hello world"}, slack, ["foobar"]) == nil
   end
 
+  test "#match supports direct messages when configured" do
+    Application.put_env(:slacker, :allow_direct_messages, true)
+    assert Slacker.Filter.match(%{user: "2", channel: "DMEANSDIRECT", text: "hello world"}, slack, ["foobar"]) == "hello world"
+    assert Slacker.Filter.match(%{user: "2", channel: "CMEANSCHANNEL", text: "hello world"}, slack, ["foobar"]) == nil
+  end
+
+  test "#match does not support direct messages when configured" do
+    Application.put_env(:slacker, :allow_direct_messages, false)
+    assert Slacker.Filter.match(%{user: "2", channel: "DMEANSDIRECT", text: "hello world"}, slack, ["foobar"]) == nil
+        assert Slacker.Filter.match(%{user: "2", channel: "CMEANSCHANNEL", text: "hello world"}, slack, ["foobar"]) == nil
+  end
+
   test "#match returns nil if the prefix is not used" do
     assert Slacker.Filter.match(%{user: "2", text: "foobar hello world"}, slack, []) == nil
   end
