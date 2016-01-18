@@ -81,12 +81,16 @@ config :slacker,
   command_prefix: "slacker",
   slack_api_token: System.get_env("SLACK_API_TOKEN"),
   parsers: [Slacker.Parsers.Prefix],
+  allow_direct_messsages: true,
   commands: [Slacker.Commands.Echo, Slacker.Commands.Ping]
 ```
 
 You must set all of these when you include this dependency in your project,
 however you can easily run this project as is and the above credentials will
 log you into slack so long as you set the SLACK_API_TOKEN env var.
+
+## Direct Messages
+If it makes sense for your bot to receive direct messages, then set the `allow_direct_messsages` to true, otherwise - don't. It may not make sense for your bot to receive direct messages if it relies on the channel to provide state.
 
 ## Custom Parsers
 You can write your own command parsers if you need special parsing that doesn't fit in with the prefix parsing. For example if your command parser needs infix parsing you could do the following:
