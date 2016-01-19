@@ -90,7 +90,7 @@ however you can easily run this project as is and the above credentials will
 log you into slack so long as you set the SLACK_API_TOKEN env var.
 
 ## Direct Messages
-If it makes sense for your bot to receive direct messages, then set the `allow_direct_messsages` to true, otherwise - don't. It may not make sense for your bot to receive direct messages if it relies on the channel to provide state.
+If it makes sense for your bot to receive direct messages, then set the `allow_direct_messsages` to true, otherwise - don't. It may not make sense for your bot to receive direct messages if for example it relies on the channel to provide state. Note that direct messages do not require a command prefix, e.g. a direct message of `echo hello` will be parsed correctly.
 
 ## Custom Parsers
 You can write your own command parsers if you need special parsing that doesn't fit in with the prefix parsing. For example if your command parser needs infix parsing you could do the following:
