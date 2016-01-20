@@ -42,7 +42,7 @@ output of `slacker help` if they are defined.
 The commands that your bot actually runs must be configured and you can mix and
 match between packaged commands and any commands you define.
 
-## Listening For Arbitrary Messages
+### Listening For Arbitrary Messages
 
 If for some reason you need to listen for arbitrary messages that aren't parsed
 as commands you can add a function to pattern match for plain messages. Below
