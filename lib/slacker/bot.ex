@@ -28,8 +28,7 @@ defmodule Slacker.Bot do
 
   def handle_message(message = %{type: "message"}, slack, state = %{event_manager: event_manager, command_prefixes: command_prefixes}) do
     Logger.debug fn -> "Received message from slack: #{message.text}" end
-    meta = %{bot_pid: self, message: message}
-
+    meta = %{bot_pid: self, message: message, user: slack.users[message.user]}
     # Try to match command pattern then dispatch that
     if matched = Slacker.Filter.match(message, slack, command_prefixes) do
       Logger.debug fn -> "Matched message: #{inspect(matched)}" end

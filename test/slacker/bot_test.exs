@@ -35,7 +35,8 @@ defmodule Slacker.BotTest do
     %{
       me: %{
         id: "abc_123",
-      }
+      },
+      users: %{}
     }
   end
 
