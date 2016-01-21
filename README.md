@@ -52,25 +52,6 @@ output of `slacker help` if they are defined.
 The commands that your bot actually runs must be configured and you can mix and
 match between packaged commands and any commands you define.
 
-### Channel Events
-You can listen for channel join and leave events like so: 
-
-```elixir
-defmodule Slacker.Commands.JoinEvent do
-  use Slacker.Command
-
-  @usage "channel join"
-  @short_description "responds hello when the user joins"
-
-  def handle_event({{:event, "channel_join", user}, meta}) do
-    respond("Hello #{user}!", meta)
-    {:ok, count}
-  end
-end
-```
-
-Supported events are `channel_join` and `channel_leave`
-
 ### Listening For Arbitrary Messages
 
 If for some reason you need to listen for arbitrary messages that aren't parsed

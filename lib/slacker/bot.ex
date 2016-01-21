@@ -26,18 +26,6 @@ defmodule Slacker.Bot do
     event_manager
   end
 
-  def handle_message(message = %{type: "message", subtype: "channel_join", user: user}, slack, state = %{event_manager: event_manager}) do
-    Logger.debug fn -> "Notifying for event: #{inspect(message)}" end
-    meta = %{bot_pid: self, message: message}
-    GenEvent.notify(event_manager, {{:event, "channel_join", user}, meta})
-  end
-  
-  def handle_message(message = %{type: "message", subtype: "channel_leave", user: user}, slack, state = %{event_manager: event_manager}) do
-      Logger.debug fn -> "Notifying for event: #{inspect(message)}" end
-      meta = %{bot_pid: self, message: message}
-      GenEvent.notify(event_manager, {{:event, "channel_leave", user}, meta})
-  end
-    
   def handle_message(message = %{type: "message"}, slack, state = %{event_manager: event_manager, command_prefixes: command_prefixes}) do
     Logger.debug fn -> "Received message from slack: #{message.text}" end
     meta = %{bot_pid: self, message: message}
