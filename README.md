@@ -6,6 +6,16 @@ create your own mix project and bring this in as a dependency. You can define
 your own commands or just use the packaged ones and you configure that in your
 project.
 
+## What this project is, and isn't.
+
+This project is primarily focused around parsing and dispatching simple commands
+that are either addressed to the bot in a channel - or sent via direct messages.
+
+At the moment, there aren't plans to support [message subtypes](https://api.slack.com/events/message#message_subtypes)
+directly, if for example you would like to be notified when a user joins a channel
+the current recommendation is to follow the instructions for subscribing to
+[arbitrary messages](#listening-for-arbitrary-messages) and matching on meta.message
+
 ## Commands
 Commands are a way of perfoming an action when someone uses the magic keyword.
 The command prefix must be configured, but lets assume it is `"slacker"`. An
