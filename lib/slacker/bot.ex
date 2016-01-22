@@ -26,6 +26,14 @@ defmodule Slacker.Bot do
     event_manager
   end
 
+  def handle_message(message = %{type: "channel_joined", channel: channel}, slack, state = %{event_manager: event_manager})do
+    Logger.debug fn -> "Notifying for channel_joined #{channel.name}" end
+
+    meta = %{bot_pid: self, message: message}
+    GenEvent.notify(event_manager, {{:channel_joined, channel, me: slack.me}, meta})
+    {:ok, state}
+  end
+
   def handle_message(message = %{type: "message"}, slack, state = %{event_manager: event_manager, command_prefixes: command_prefixes}) do
     Logger.debug fn -> "Received message from slack: #{message.text}" end
     meta = %{bot_pid: self, message: message, user: slack.users[message.user]}
@@ -48,13 +56,13 @@ defmodule Slacker.Bot do
     {:ok, state}
   end
 
-  def handle_info({:reply, message, reply_text}, slack, state) do
-    send_message(reply_text, message.channel, slack)
-
+  def handle_message(_message, _slack, state) do
     {:ok, state}
   end
 
-  def handle_message(_message, _slack, state) do
+  def handle_info({:reply, slack_id, reply_text}, slack, state) do
+    send_message(reply_text, slack_id, slack)
+
     {:ok, state}
   end
 end

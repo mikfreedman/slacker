@@ -4,8 +4,12 @@ defmodule Slacker.Command do
       @before_compile unquote(__MODULE__)
       use GenEvent
 
-      def respond(reply_text, %{bot_pid: bot_pid, message: message}) do
-        send bot_pid, {:reply, message, reply_text}
+      def respond(reply_text, %{bot_pid: bot_pid, message: %{channel: %{id: channel_id}}}) do
+        send bot_pid, {:reply, channel_id, reply_text}
+      end
+
+      def respond(reply_text, %{bot_pid: bot_pid, message: %{channel: channel_id}}) do
+        send bot_pid, {:reply, channel_id, reply_text}
       end
     end
   end

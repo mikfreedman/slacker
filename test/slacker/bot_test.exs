@@ -18,6 +18,13 @@ defmodule Slacker.BotTest do
     event_manager
   end
 
+  def channel_joined_event do
+    %{
+      type: "channel_joined",
+      channel: %{name: "the_channel"}
+    }
+  end
+
   def echo_message do
     %{
       type: "message",
@@ -45,6 +52,11 @@ defmodule Slacker.BotTest do
       event_manager: new_event_manager,
       command_prefixes: ["slacker"],
     }
+  end
+
+  test "#handle_message dispatches channel join to the event manager" do
+    Slacker.Bot.handle_message(channel_joined_event, slack_details, state)
+    assert_receive %{gen_event_message: {{:channel_joined, _channel}, _meta}}, 100
   end
 
   test "#handle_message dispatches an echo command to the event manager" do
