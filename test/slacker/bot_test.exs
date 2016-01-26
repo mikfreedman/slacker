@@ -1,6 +1,12 @@
 defmodule Slacker.BotTest do
   use ExUnit.Case
 
+  defmodule StubClient do
+    def send({:text, json}, pid) do
+      Kernel.send pid, json
+    end
+  end
+
   defmodule EventHandler do
     use GenEvent
 
@@ -73,5 +79,13 @@ defmodule Slacker.BotTest do
     slack = %{foo: "bar"}
     Slacker.Bot.handle_info({:slack_state, self}, slack, {})
     assert_receive {:slack_state, slack}, 100
+  end
+
+  test "#handle_info with :reply_raw sends raw json through socket" do
+    slack = %{socket: self, client: StubClient}
+
+    {:ok, :state} = Slacker.Bot.handle_info({:reply_raw, "{\"hello\":\"world\"}"}, slack, :state)
+
+    assert_receive "{\"hello\":\"world\"}", 100
   end
 end
