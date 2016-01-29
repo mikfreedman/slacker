@@ -31,14 +31,14 @@ defmodule Slacker.Bot do
   def handle_message(message = %{type: "channel_joined", channel: channel}, slack, state = %{event_manager: event_manager})do
     Logger.debug fn -> "Notifying for channel_joined #{channel.name}" end
 
-    meta = %{bot_pid: self, message: message}
+    meta = %{bot_pid: self, message: message, slack: slack}
     GenEvent.notify(event_manager, {{:channel_joined, channel, me: slack.me}, meta})
     {:ok, state}
   end
 
   def handle_message(message = %{type: "message"}, slack, state = %{event_manager: event_manager, command_prefixes: command_prefixes}) do
     Logger.debug fn -> "Received message from slack: #{message.text}" end
-    meta = %{bot_pid: self, message: message, user: slack.users[message.user]}
+    meta = %{bot_pid: self, message: message, user: slack.users[message.user], slack: slack}
     # Try to match command pattern then dispatch that
     if matched = Slacker.Filter.match(message, slack, command_prefixes) do
       Logger.debug fn -> "Matched message: #{inspect(matched)}" end

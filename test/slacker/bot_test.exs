@@ -62,17 +62,17 @@ defmodule Slacker.BotTest do
 
   test "#handle_message dispatches channel join to the event manager" do
     Slacker.Bot.handle_message(channel_joined_event, slack_details, state)
-    assert_receive %{gen_event_message: {{:channel_joined, _channel, _me}, _meta}}, 100
+    assert_receive %{gen_event_message: {{:channel_joined, _channel, _me}, %{slack: slack_details}}}, 100
   end
 
   test "#handle_message dispatches an echo command to the event manager" do
     Slacker.Bot.handle_message(echo_message, slack_details, state)
-    assert_receive %{gen_event_message: {{:command, "echo", "hello world"}, _meta}}, 100
+    assert_receive %{gen_event_message: {{:command, "echo", "hello world"}, %{slack: slack_details}}}, 100
   end
 
   test "#handle_message even dispatches things that are not commands" do
     Slacker.Bot.handle_message(not_a_command_message, slack_details, state)
-    assert_receive %{gen_event_message: {{:message, "not a command"}, _meta}}, 100
+    assert_receive %{gen_event_message: {{:message, "not a command"}, %{slack: slack_details}}}, 100
   end
 
   test "#handle_info responds with slack_state" do
