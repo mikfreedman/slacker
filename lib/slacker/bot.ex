@@ -33,6 +33,7 @@ defmodule Slacker.Bot do
 
     meta = %{bot_pid: self, message: message, slack: slack}
     GenEvent.notify(event_manager, {{:channel_joined, channel, me: slack.me}, meta})
+    GenEvent.notify(event_manager, {{:slack_rtm_event, message}, meta})
     {:ok, state}
   end
 
@@ -55,10 +56,13 @@ defmodule Slacker.Bot do
       GenEvent.notify(event_manager, {{:message, message.text}, meta})
     end
 
+    GenEvent.notify(event_manager, {{:slack_rtm_event, message}, meta})
     {:ok, state}
   end
 
-  def handle_message(_message, _slack, state) do
+  def handle_message(message, slack, state = %{event_manager: event_manager}) do
+    meta = %{bot_pid: self, message: message, slack: slack}
+    GenEvent.notify(event_manager, {{:slack_rtm_event, message}, meta})
     {:ok, state}
   end
 

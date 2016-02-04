@@ -31,6 +31,13 @@ defmodule Slacker.BotTest do
     }
   end
 
+  def generic_type_event do
+    %{
+      type: "generic_type",
+      channel: %{name: "the_channel"}
+    }
+  end
+
   def echo_message do
     %{
       type: "message",
@@ -60,9 +67,10 @@ defmodule Slacker.BotTest do
     }
   end
 
-  test "#handle_message dispatches channel join to the event manager" do
+  test "#handle_message dispatches channel joined to the event manager" do
     Slacker.Bot.handle_message(channel_joined_event, slack_details, state)
     assert_receive %{gen_event_message: {{:channel_joined, _channel, _me}, %{slack: slack_details}}}, 100
+    assert_receive %{gen_event_message: {{:slack_rtm_event, _message}, _meta}}, 100
   end
 
   test "#handle_message dispatches an echo command to the event manager" do
@@ -73,12 +81,19 @@ defmodule Slacker.BotTest do
   test "#handle_message even dispatches things that are not commands" do
     Slacker.Bot.handle_message(not_a_command_message, slack_details, state)
     assert_receive %{gen_event_message: {{:message, "not a command"}, %{slack: slack_details}}}, 100
+    assert_receive %{gen_event_message: {{:slack_rtm_event, _message}, _meta}}, 100
   end
 
   test "#handle_info responds with slack_state" do
     slack = %{foo: "bar"}
     Slacker.Bot.handle_info({:slack_state, self}, slack, {})
     assert_receive {:slack_state, slack}, 100
+  end
+
+  test "#handle_message with generic type should pass through message to rtm" do
+    Slacker.Bot.handle_message(generic_type_event, slack_details, state)
+    message = generic_type_event
+    assert_receive %{gen_event_message: {{:slack_rtm_event, ^message}, _meta}}, 100
   end
 
   test "#handle_info with :reply_raw sends raw json through socket" do
