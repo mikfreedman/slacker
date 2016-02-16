@@ -5,8 +5,6 @@ defmodule Slacker.Bot do
   def handle_connect(slack, _) do
     Logger.info fn -> "Connected to Slack." end
 
-    Process.register(self, __MODULE__)
-
     commands = Application.get_env(:slacker, :commands)
     event_manager = setup_event_manager(commands)
 
