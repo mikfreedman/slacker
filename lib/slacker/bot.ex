@@ -2,7 +2,7 @@ defmodule Slacker.Bot do
   require Logger
   use Slack
 
-  def handle_connect(slack, _) do
+  def handle_connect(slack, initial_state) do
     Logger.info fn -> "Connected to Slack." end
 
     commands = Application.get_env(:slacker, :commands)
@@ -10,7 +10,7 @@ defmodule Slacker.Bot do
 
     command_prefixes = List.wrap(Application.get_env(:slacker, :command_prefix)) ++ [ "<@#{slack.me.id}>" ]
 
-    {:ok, %{event_manager: event_manager, command_prefixes: command_prefixes}}
+    {:ok, %{event_manager: event_manager, command_prefixes: command_prefixes, initial_state: initial_state}}
   end
 
   def setup_event_manager(commands) do
@@ -26,18 +26,18 @@ defmodule Slacker.Bot do
     event_manager
   end
 
-  def handle_message(message = %{type: "channel_joined", channel: channel}, slack, state = %{event_manager: event_manager})do
+  def handle_message(message = %{type: "channel_joined", channel: channel}, slack, state = %{event_manager: event_manager, initial_state: initial_state}) do
     Logger.debug fn -> "Notifying for channel_joined #{channel.name}" end
 
-    meta = %{bot_pid: self, message: message, slack: slack}
+    meta = %{bot_pid: self, message: message, slack: slack, initial_state: initial_state}
     GenEvent.notify(event_manager, {{:channel_joined, channel, me: slack.me}, meta})
     GenEvent.notify(event_manager, {{:slack_rtm_event, message}, meta})
     {:ok, state}
   end
 
-  def handle_message(message = %{type: "message"}, slack, state = %{event_manager: event_manager, command_prefixes: command_prefixes}) do
+  def handle_message(message = %{type: "message"}, slack, state = %{event_manager: event_manager, command_prefixes: command_prefixes, initial_state: initial_state}) do
     Logger.debug fn -> "Received message from slack: #{message.text}" end
-    meta = %{bot_pid: self, message: message, user: slack.users[message.user], slack: slack}
+    meta = %{bot_pid: self, message: message, user: slack.users[message.user], slack: slack, initial_state: initial_state}
     # Try to match command pattern then dispatch that
     if matched = Slacker.Filter.match(message, slack, command_prefixes) do
       Logger.debug fn -> "Matched message: #{inspect(matched)}" end
@@ -58,8 +58,8 @@ defmodule Slacker.Bot do
     {:ok, state}
   end
 
-  def handle_message(message, slack, state = %{event_manager: event_manager}) do
-    meta = %{bot_pid: self, message: message, slack: slack}
+  def handle_message(message, slack, state = %{event_manager: event_manager, initial_state: initial_state}) do
+    meta = %{bot_pid: self, message: message, slack: slack, initial_state: initial_state}
     GenEvent.notify(event_manager, {{:slack_rtm_event, message}, meta})
     {:ok, state}
   end

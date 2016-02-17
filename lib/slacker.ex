@@ -9,7 +9,7 @@ defmodule Slacker do
     slack_api_token = Application.get_env(:slacker, :slack_api_token)
 
     children = [
-      worker(Slacker.Bot, [slack_api_token, []]),
+      worker(Slacker.Bot, [slack_api_token, %{slack_api_token: slack_api_token}]),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

@@ -64,6 +64,7 @@ defmodule Slacker.BotTest do
     %{
       event_manager: new_event_manager,
       command_prefixes: ["slacker"],
+      initial_state: "the_initial_state"
     }
   end
 
