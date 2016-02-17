@@ -81,4 +81,10 @@ defmodule Slacker.Bot do
 
     {:ok, state}
   end
+
+  def handle_info({:state, pid}, slack, state) do
+    send pid, {:state, slack, state}
+
+    {:ok, state}
+  end
 end
